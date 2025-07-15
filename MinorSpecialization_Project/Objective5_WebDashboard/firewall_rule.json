@@ -1,0 +1,5 @@
+{
+  "rule_id": 1,
+  "action": "BLOCK",
+  "ip_address": "192.168.10.50"
+}

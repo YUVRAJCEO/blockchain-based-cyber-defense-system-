@@ -1,0 +1,16 @@
+[
+  {
+    "ip": "127.0.0.1",
+    "event": "Intrusion attempt detected on /trap endpoint",
+    "timestamp": "2025-07-09T13:45:56.789Z",
+    "risk_level": "High",
+    "status": "logged"
+  },
+  {
+    "ip": "127.0.0.1",
+    "event": "Brute force attack detected",
+    "timestamp": "2025-07-09T13:48:01.456Z",
+    "risk_level": "Medium",
+    "status": "logged"
+  }
+]

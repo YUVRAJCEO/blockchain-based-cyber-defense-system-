@@ -1,0 +1,20 @@
+[
+    {
+        "timestamp": "2025-07-07 14:23:01",
+        "attacker_ip": "192.168.1.15",
+        "risk_level": "High",
+        "message": "Unauthorized access attempt detected on /trap endpoint."
+    },
+    {
+        "timestamp": "2025-07-07 14:28:42",
+        "attacker_ip": "10.0.0.5",
+        "risk_level": "Medium",
+        "message": "Suspicious scanning activity detected."
+    },
+    {
+        "timestamp": "2025-07-07 14:31:19",
+        "attacker_ip": "172.16.2.20",
+        "risk_level": "Low",
+        "message": "Single failed login attempt."
+    }
+]

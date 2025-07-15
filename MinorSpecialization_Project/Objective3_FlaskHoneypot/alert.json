@@ -1,0 +1,6 @@
+{
+    "ip": "127.0.0.1",
+    "event": "Intrusion attempt detected on /trap endpoint",
+    "timestamp": "2025-07-07T15:21:33.123Z",
+    "status": "logged"
+}

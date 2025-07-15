@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cyber Defense Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff4081, #3f51b5);
+      color: #fff;
+      padding: 40px;
+      margin: 0;
+    }
+    .card {
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    canvas {
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 20px;
+    }
+    a {
+      color: #ffeb3b;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    h1, h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 Cyber Defense Dashboard</h1>
+
+  <div class="card">
+    <h2>SDN Firewall Rule</h2>
+    <pre id="firewallRule">Loading...</pre>
+  </div>
+
+  <div class="card">
+    <h2>Blockchain Data</h2>
+    <p><strong>Blockchain Hash:</strong> <span id="blockchainHash">Loading...</span></p>
+    <p id="ipfsLink"></p>
+  </div>
+
+  <div class="card">
+    <h2>Honeypot Alert Analysis</h2>
+    <canvas id="riskPie" width="400" height="400"></canvas>
+    <br>
+    <canvas id="attackBar" width="600" height="300"></canvas>
+  </div>
+
+  <script>
+    if (localStorage.getItem("loggedIn") !== "true") {
+      window.location.href = "login.html";
+    }
+
+    async function loadDashboard() {
+      try {
+        // Load SDN firewall rule
+        const ruleResponse = await fetch('firewall_rule.json');
+        const ruleData = await ruleResponse.json();
+        document.getElementById('firewallRule').textContent =
+          JSON.stringify(ruleData, null, 4);
+
+        // Load blockchain data
+        const blockchainResponse = await fetch('blockchain_hash.json');
+        const blockchainData = await blockchainResponse.json();
+
+        document.getElementById('blockchainHash').textContent =
+          blockchainData.blockchain_recorded_hash || 'N/A';
+
+        if (blockchainData.alert_logs_ipfs_cid) {
+          const cid = blockchainData.alert_logs_ipfs_cid;
+          const link = `https://gateway.pinata.cloud/ipfs/${cid}`;
+          document.getElementById('ipfsLink').innerHTML = `
+            <strong>Honeypot Logs:</strong>
+            <a href="${link}" target="_blank">
+              View alert.json on IPFS
+            </a>
+          `;
+        } else {
+          document.getElementById('ipfsLink').textContent =
+            "No IPFS CID found.";
+        }
+
+        // Load honeypot alerts
+        const alertResponse = await fetch('alert.json');
+        const alerts = await alertResponse.json();
+
+        // Risk levels
+        const riskCounts = { High: 0, Medium: 0, Low: 0 };
+        const timestamps = {};
+
+        alerts.forEach(alert => {
+          riskCounts[alert.risk_level] =
+            (riskCounts[alert.risk_level] || 0) + 1;
+
+          timestamps[alert.timestamp] =
+            (timestamps[alert.timestamp] || 0) + 1;
+        });
+
+        // Pie Chart - Risk Levels
+        const pieCtx = document.getElementById('riskPie').getContext('2d');
+        new Chart(pieCtx, {
+          type: 'pie',
+          data: {
+            labels: ['High', 'Medium', 'Low'],
+            datasets: [{
+              data: [
+                riskCounts.High,
+                riskCounts.Medium,
+                riskCounts.Low
+              ],
+              backgroundColor: ['#f44336', '#ff9800', '#4caf50']
+            }]
+          },
+          options: {
+            plugins: {
+              title: {
+                display: true,
+                text: 'Risk Level Distribution',
+                color: '#000',
+                font: { size: 18 }
+              },
+              legend: {
+                labels: {
+                  color: '#000'
+                }
+              }
+            }
+          }
+        });
+
+        // Bar Chart - Attack Frequency
+        const barCtx = document.getElementById('attackBar').getContext('2d');
+        new Chart(barCtx, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(timestamps),
+            datasets: [{
+              label: 'Number of Attacks',
+              data: Object.values(timestamps),
+              backgroundColor: '#2196f3'
+            }]
+          },
+          options: {
+            scales: {
+              x: {
+                ticks: { color: '#000' }
+              },
+              y: {
+                ticks: { color: '#000' }
+              }
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: 'Attack Frequency Over Time',
+                color: '#000',
+                font: { size: 18 }
+              },
+              legend: {
+                labels: { color: '#000' }
+              }
+            }
+          }
+        });
+
+      } catch (err) {
+        console.error("Error loading dashboard data:", err);
+      }
+    }
+
+    loadDashboard();
+  </script>
+
+</body>
+</html>
